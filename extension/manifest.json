@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "TTD Auto Fill Pro",
+  "version": "1.0.0",
+  "description": "Instantly autofill pilgrim details on the official TTD booking portal.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://ttdevasthanams.ap.gov.in/*",
+    "https://*.ttdevasthanams.ap.gov.in/*",
+    "https://*.tirupatibalaji.ap.gov.in/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://ttdevasthanams.ap.gov.in/*",
+        "https://*.ttdevasthanams.ap.gov.in/*",
+        "https://*.tirupatibalaji.ap.gov.in/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
+}

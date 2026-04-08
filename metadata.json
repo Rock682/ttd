@@ -1,0 +1,5 @@
+{
+  "name": "TTD Auto Fill Pro Extension",
+  "description": "A production-ready Chrome Extension for autofilling pilgrim details on the TTD booking portal.",
+  "requestFramePermissions": []
+}
