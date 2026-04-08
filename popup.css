@@ -1,0 +1,180 @@
+/* TTD Auto Fill Pro - Complete Styles */
+
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Tailwind-like Utility Classes */
+.p-4 { padding: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mt-6 { margin-top: 1.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 0.5rem; }
+.gap-1 { gap: 0.25rem; }
+.gap-4 { gap: 1rem; }
+.flex-1 { flex: 1; }
+.hidden { display: none !important; }
+.w-full { width: 100%; }
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Colors & Themes */
+.bg-gray-50 { background-color: #f9fafb; }
+.bg-white { background-color: #ffffff; }
+.bg-gray-100 { background-color: #f3f4f6; }
+.bg-gray-200 { background-color: #e5e7eb; }
+.bg-orange-600 { background-color: #ea580c; }
+.bg-orange-100 { background-color: #ffedd5; }
+.bg-blue-600 { background-color: #2563eb; }
+.bg-red-500 { background-color: #ef4444; }
+
+.text-gray-900 { color: #111827; }
+.text-gray-600 { color: #4b5563; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-400 { color: #9ca3af; }
+.text-orange-600 { color: #ea580c; }
+.text-orange-400 { color: #fb923c; }
+.text-white { color: #ffffff; }
+.text-red-500 { color: #ef4444; }
+
+.dark {
+  background-color: #111827;
+  color: #f9fafb;
+}
+.dark .bg-gray-900 { background-color: #111827; }
+.dark .bg-gray-800 { background-color: #1f2937; }
+.dark .bg-gray-800\/50 { background-color: rgba(31, 41, 55, 0.5); }
+.dark .bg-orange-900\/20 { background-color: rgba(124, 45, 18, 0.2); }
+.dark .text-gray-100 { color: #f3f4f6; }
+.dark .text-gray-400 { color: #9ca3af; }
+.dark .border-gray-800 { border-color: #1f2937; }
+.dark .border-gray-700 { border-color: #374151; }
+
+/* Components */
+.text-xl { font-size: 1.25rem; }
+.text-lg { font-size: 1.125rem; }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+.uppercase { text-transform: uppercase; }
+.tracking-wider { letter-spacing: 0.05em; }
+.tracking-tighter { letter-spacing: -0.05em; }
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.rounded-full { border-radius: 9999px; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+
+.border { border: 1px solid #e5e7eb; }
+.border-gray-200 { border-color: #e5e7eb; }
+.border-gray-300 { border-color: #d1d5db; }
+
+/* Custom Scrollbar */
+#pilgrim-list::-webkit-scrollbar {
+  width: 4px;
+}
+#pilgrim-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+#pilgrim-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.dark #pilgrim-list::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+/* Toggle Switch */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.peer:checked ~ .peer-checked\:bg-orange-600 {
+  background-color: #ea580c;
+}
+
+.peer:checked ~ .peer-checked\:after\:translate-x-full::after {
+  transform: translateX(100%);
+}
+
+/* Form Inputs */
+input[type="text"], input[type="number"], select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dark input, .dark select {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: white;
+}
+
+input:focus, select:focus {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2);
+}
+
+/* Pilgrim Item */
+.pilgrim-item {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideIn 0.2s ease-out forwards;
+}
+
+.dark .pilgrim-item {
+  background-color: rgba(31, 41, 55, 0.5);
+  border-color: #1f2937;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Icons */
+.w-5 { width: 1.25rem; }
+.h-5 { height: 1.25rem; }

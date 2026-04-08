@@ -107,25 +107,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       clearAllBtn.classList.remove('hidden');
       pilgrims.forEach((p, index) => {
         const item = document.createElement('div');
-        item.className = 'pilgrim-item bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-between group hover:border-orange-300 dark:hover:border-orange-900 transition-all';
+        item.className = 'pilgrim-item';
         item.innerHTML = `
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold text-xs">
+            <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold text-xs" style="width: 32px; height: 32px; border-radius: 50%; background: #ffedd5; color: #ea580c; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
               ${index + 1}
             </div>
-            <div>
-              <h3 class="font-bold text-sm truncate max-w-[180px]">${p.name}</h3>
-              <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">
+            <div style="min-width: 0; flex: 1;">
+              <h3 class="font-bold text-sm truncate" style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${p.name}</h3>
+              <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold" style="margin: 0; font-size: 10px;">
                 ${p.age} yrs • ${p.gender} • ${p.idProofType}
               </p>
             </div>
           </div>
-          <div class="flex gap-1 transition-opacity">
-            <button class="edit-btn p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-blue-600 rounded-md transition-colors" data-id="${p.id}">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          <div class="flex gap-1">
+            <button class="edit-btn p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-blue-600 rounded-md transition-colors" data-id="${p.id}" style="background: transparent; border: none; padding: 6px; cursor: pointer;">
+              <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             </button>
-            <button class="delete-btn p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 rounded-md transition-colors" data-id="${p.id}">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <button class="delete-btn p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 rounded-md transition-colors" data-id="${p.id}" style="background: transparent; border: none; padding: 6px; cursor: pointer;">
+              <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
           </div>
         `;

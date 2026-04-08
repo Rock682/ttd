@@ -349,6 +349,8 @@
       gender: [
         'mat-select[aria-label*="Gender"]',
         'mat-select[formcontrolname*="gender"]',
+        'mat-select[placeholder*="Gender"]',
+        'mat-select[id*="gender"]',
         'select[aria-label*="Gender"]',
         'select[name*="gender"]',
         'select[formcontrolname*="gender"]',
@@ -356,9 +358,16 @@
       ],
       idProof: [
         'mat-select[aria-label*="ID Proof"]',
+        'mat-select[aria-label*="Photo ID Proof"]',
         'mat-select[formcontrolname*="idProof"]',
         'mat-select[formcontrolname*="idProofType"]',
+        'mat-select[formcontrolname*="photoIdProof"]',
+        'mat-select[placeholder*="ID Proof"]',
+        'mat-select[placeholder*="Photo ID Proof"]',
+        'mat-select[id*="idProof"]',
+        'mat-select[id*="photoIdProof"]',
         'select[aria-label*="ID Proof"]',
+        'select[aria-label*="Photo ID Proof"]',
         'select[name*="idProof"]',
         'select[formcontrolname*="idProof"]',
         'select[id*="idProof"]',
@@ -380,40 +389,43 @@
       const selectors = fieldSelectors[type];
       let element = null;
 
-      // Strategy 1: Search within the row container
-      if (container !== document) {
-        for (const sel of selectors) {
-          element = container.querySelector(sel);
-          if (element) break;
-        }
-      }
-
-      // Strategy 2: Search by label text within the container
-      if (!element && container !== document) {
-        element = findElementByLabelText(container, type);
-      }
-
-      // Strategy 3: Search globally and pick the N-th one
-      if (!element) {
-        for (const sel of selectors) {
-          const all = document.querySelectorAll(sel);
-          if (all[index]) {
-            element = all[index];
-            break;
+      // Try multiple strategies to find the element
+      const findElement = () => {
+        // Strategy 1: Search within the row container
+        if (container !== document) {
+          for (const sel of selectors) {
+            try {
+              element = container.querySelector(sel);
+              if (element) return element;
+            } catch (e) {}
           }
         }
-      }
 
-      // Strategy 4: Global label search
-      if (!element) {
-        const allLabels = findElementsByLabelText(document, type);
-        if (allLabels[index]) {
-          element = allLabels[index];
+        // Strategy 2: Search by label text within the container
+        if (container !== document) {
+          element = findElementByLabelText(container, type);
+          if (element) return element;
         }
-      }
+
+        // Strategy 3: Search globally and pick the N-th one
+        for (const sel of selectors) {
+          try {
+            const all = document.querySelectorAll(sel);
+            if (all[index]) return all[index];
+          } catch (e) {}
+        }
+
+        // Strategy 4: Global label search
+        const allLabels = findElementsByLabelText(document, type);
+        if (allLabels[index]) return allLabels[index];
+
+        return null;
+      };
+
+      element = findElement();
 
       if (element) {
-        if (element.tagName === 'SELECT' || element.tagName === 'MAT-SELECT' || element.getAttribute('role') === 'combobox') {
+        if (element.tagName === 'SELECT' || element.tagName === 'MAT-SELECT' || element.getAttribute('role') === 'combobox' || element.classList.contains('mat-select')) {
           await selectOption(element, value);
         } else {
           element.value = value;
@@ -433,6 +445,7 @@
     await fillField('age', pilgrim.age);
     await fillField('gender', pilgrim.gender);
     await fillField('idProof', pilgrim.idProofType);
+    await sleep(300); // Small delay after ID proof selection
     await fillField('idNumber', pilgrim.idNumber);
 
     return fieldsFilled > 0;
@@ -441,75 +454,129 @@
   // --- Helpers ---
 
   async function selectOption(element, value) {
+    console.log(`TTD Auto Fill Pro: Selecting option "${value}" for`, element);
+    
     // Standard Select
     if (element.tagName === 'SELECT') {
       const options = Array.from(element.options);
       const option = options.find(o => 
-        o.text.toLowerCase().includes(value.toLowerCase()) || 
-        o.value.toLowerCase().includes(value.toLowerCase())
+        o.text.toLowerCase().trim().includes(value.toLowerCase().trim()) || 
+        o.value.toLowerCase().trim().includes(value.toLowerCase().trim())
       );
       if (option) {
         element.value = option.value;
         element.dispatchEvent(new Event('change', { bubbles: true }));
+        element.dispatchEvent(new Event('input', { bubbles: true }));
       }
     } 
     // Material Select or Role Combobox (Common in TTD)
-    else if (element.tagName === 'MAT-SELECT' || element.getAttribute('role') === 'combobox') {
-      element.click();
-      await sleep(400); // Wait for dropdown animation
+    else if (element.tagName === 'MAT-SELECT' || element.getAttribute('role') === 'combobox' || element.classList.contains('mat-select')) {
+      // Check if already selected (avoid redundant clicks)
+      const currentVal = element.textContent.toLowerCase().trim();
+      if (currentVal.includes(value.toLowerCase().trim())) {
+        console.log('TTD Auto Fill Pro: Option already selected');
+        return;
+      }
+
+      // Click to open the dropdown - try multiple targets
+      const trigger = element.querySelector('.mat-select-trigger') || element;
+      trigger.click();
+      element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
       
-      // Try to find options in the overlay
-      const optionSelectors = [
-        'mat-option',
-        '.mat-option',
-        '[role="option"]',
-        '.dropdown-item',
-        'li'
-      ];
-      
+      // Wait for dropdown animation and overlay to appear
+      // We'll retry finding the options a few times
       let found = false;
-      for (const sel of optionSelectors) {
-        const options = document.querySelectorAll(sel);
-        for (const opt of options) {
-          if (opt.textContent.toLowerCase().includes(value.toLowerCase())) {
-            opt.click();
-            found = true;
-            break;
+      const normalizedValue = value.toLowerCase().trim();
+      
+      // Special mapping for common TTD values
+      const valueMap = {
+        'aadhaar card': ['aadhaar', 'adhar', 'aadhar', 'card'],
+        'voter id': ['voter'],
+        'driving license': ['driving', 'dl'],
+        'pan card': ['pan'],
+        'male': ['male', 'm'],
+        'female': ['female', 'f'],
+        'other': ['other', 'o']
+      };
+
+      const searchTerms = [normalizedValue, ...(valueMap[normalizedValue] || [])];
+
+      for (let attempt = 0; attempt < 5; attempt++) {
+        await sleep(200); 
+        
+        const optionSelectors = [
+          'mat-option',
+          '.mat-option',
+          '[role="option"]',
+          '.mat-select-panel mat-option',
+          '.cdk-overlay-container mat-option'
+        ];
+
+        for (const sel of optionSelectors) {
+          const options = document.querySelectorAll(sel);
+          if (options.length === 0) continue;
+
+          for (const opt of options) {
+            const optText = opt.textContent.toLowerCase().trim();
+            // Exact match or smart inclusion
+            if (searchTerms.some(term => optText === term || optText.includes(term))) {
+              console.log('TTD Auto Fill Pro: Found matching option:', opt.textContent);
+              opt.click();
+              // Trigger change detection for Angular
+              element.dispatchEvent(new Event('change', { bubbles: true }));
+              element.dispatchEvent(new Event('input', { bubbles: true }));
+              found = true;
+              break;
+            }
           }
+          if (found) break;
         }
         if (found) break;
+      }
+
+      if (!found) {
+        console.warn(`TTD Auto Fill Pro: Could not find option matching "${value}" after multiple attempts`);
+        // Close the dropdown if not found by clicking backdrop
+        const backdrop = document.querySelector('.cdk-overlay-backdrop');
+        if (backdrop) backdrop.click();
       }
     }
   }
 
   function findElementByLabelText(root, type) {
-    const labels = root.querySelectorAll('label, .label, span');
+    const labels = root.querySelectorAll('label, .label, span, mat-label, .mat-form-field-label');
     const keywords = {
       name: ['name', 'full name', 'pilgrim name'],
       age: ['age'],
       gender: ['gender', 'sex'],
-      idProof: ['id proof', 'proof type', 'identity'],
-      idNumber: ['id number', 'proof number', 'identity number']
+      idProof: ['id proof', 'proof type', 'identity', 'photo id proof'],
+      idNumber: ['id number', 'proof number', 'identity number', 'photo id number']
     };
 
     const targetKeywords = keywords[type];
     for (const label of labels) {
       const text = label.textContent.toLowerCase().trim();
       if (targetKeywords.some(k => text === k || text.includes(k))) {
-        // Try to find associated input
-        // 1. Via 'for' attribute
+        // Strategy 1: Associated via 'for'
         const forId = label.getAttribute('for');
         if (forId) {
           const input = document.getElementById(forId);
           if (input) return input;
         }
-        // 2. Next sibling
+
+        // Strategy 2: Search within the same mat-form-field
+        const formField = label.closest('mat-form-field, .mat-form-field, .form-group');
+        if (formField) {
+          const input = formField.querySelector('input, select, mat-select, [role="combobox"]');
+          if (input) return input;
+        }
+
+        // Strategy 3: Next sibling or parent's child
         const next = label.nextElementSibling;
-        if (next && (next.tagName === 'INPUT' || next.tagName === 'SELECT' || next.tagName === 'MAT-SELECT')) {
+        if (next && (next.tagName === 'INPUT' || next.tagName === 'SELECT' || next.tagName === 'MAT-SELECT' || next.getAttribute('role') === 'combobox')) {
           return next;
         }
-        // 3. Parent's child
-        const input = label.parentElement.querySelector('input, select, mat-select');
+        const input = label.parentElement.querySelector('input, select, mat-select, [role="combobox"]');
         if (input && input !== label) return input;
       }
     }
@@ -518,13 +585,13 @@
 
   function findElementsByLabelText(root, type) {
     const results = [];
-    const labels = root.querySelectorAll('label, .label, span');
+    const labels = root.querySelectorAll('label, .label, span, mat-label');
     const keywords = {
       name: ['name', 'full name', 'pilgrim name'],
       age: ['age'],
       gender: ['gender', 'sex'],
-      idProof: ['id proof', 'proof type', 'identity'],
-      idNumber: ['id number', 'proof number', 'identity number']
+      idProof: ['id proof', 'proof type', 'identity', 'photo id proof'],
+      idNumber: ['id number', 'proof number', 'identity number', 'photo id number']
     };
 
     const targetKeywords = keywords[type];

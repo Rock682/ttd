@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "https://ttdevasthanams.ap.gov.in/*",
@@ -15,6 +16,9 @@
   ],
   "action": {
     "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
